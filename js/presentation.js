@@ -10,7 +10,7 @@ class Presentation {
 		const lines = text.split("\n");
 		for (let line of lines) {
 			line = line.trim();
-			if (!line || line.startsWith("#")) {
+			if (!line || line.startsWith("//")) {
 				continue;
 			} // ignore comments
 			const cards = line.split("|");
@@ -19,12 +19,23 @@ class Presentation {
 
 			for (let c of cards) {
 				let [cardName, count] = c.split("*");
+				let set = null;
+				let collectorNumber = null;
+
+				// Parse set and collector number if provided
+				if (cardName.includes("@")) {
+					[cardName, set] = cardName.split("@");
+				}
+				if (cardName.includes("#")) {
+					[cardName, collectorNumber] = cardName.split("#");
+				}
+
 				cardName = cardName.trim();
 				if (!cardName) {
 					continue;
 				}
-				const card = { name: cardName, count };
-				card.img = await imageUrl(cardName);
+				const card = { name: cardName, count, set, collectorNumber };
+				card.img = await imageUrl(cardName, set, collectorNumber);
 				slide.push(card);
 			}
 		}
