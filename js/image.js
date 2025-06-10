@@ -62,7 +62,18 @@ async function imageUrl(cardName, set = null, collectorNumber = null, excludeRep
         return null;
     }
 
-    url = cardData.image_uris[format];
+    url = cardData.image_uris?.[format]; // Check if image_uris exists
+
+    if (!url && cardData.card_faces) {
+        // Handle double-faced cards or tokens
+        url = cardData.card_faces[0].image_uris?.[format]; // Use the first face's image_uris
+    }
+
+    if (!url) {
+        console.warn(`Could not find image for card "${cardName}" in the expected format.`);
+        return null;
+    }
+
     cache[cacheKey] = url; // Save the URL in the cache with the unique key
     saveCache(); // Save the updated cache to localStorage
     return url;
